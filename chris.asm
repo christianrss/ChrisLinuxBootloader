@@ -12,7 +12,9 @@ section .bootloader
     msg1:
         db "Relocating...",0x0a,0x0d,0x00
     msg2:
-        db "Relocation successful",0x0a,0x0d,0x00
+        db "Chris bootloader",0x0a,0x0d,0x00
+    err1:
+        db "FATAL: No bootable partitions",0x0a,0x0d,0x00
 
     print:
         push bp
@@ -38,6 +40,56 @@ section .bootloader
     .end:
         mov sp,bp
         pop bp
+        ret
+
+    diskutil:
+        push bp
+        mov bp,sp
+        mov ax, 0x0201
+        mov bx,0xfc00
+        clc
+        int 0x13
+
+        mov sp,bp
+        pop bp
+        ret
+
+    getchs:
+        push bp
+        mov bp,sp
+        mov bx,partition
+        xor ax,ax
+        mov cx,0x04
+    
+    .loop1:
+        mov byte al,[bx]
+        and al,0x80
+        cmp al,0x80
+        je .chs
+
+        dec cx
+        jz .err
+        add bx,0x10
+        jmp .loop
+
+    .err:
+        stc
+        mov sp,bp
+        pop bp
+        ret
+
+    .chs:
+        add bx,[partition.start]
+        xor cx,cx
+        mov byte ch,[bx]
+        inc bx
+        mov byte dh,[bx]
+        inc bx
+        mov byte cl,[bx]
+
+        mov sp,bp
+        pop bp
+        clc
         ret
 
     main:
@@ -72,6 +124,20 @@ section .bootloader
         
     successful:
         mov ax,msg2
+        push ax
+        call print
+        sub sp,0x02
+
+        call getchs
+        jc .err
+        call diskread
+        jc .err
+
+        jmp 0:0x7c00
+        jmp halt
+
+    .err:
+        mov ax,err1
         push ax
         call print
         sub sp,0x02
