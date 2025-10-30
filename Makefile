@@ -15,6 +15,8 @@ bin/boot.img: bin/chris.elf | bin
 	truncate -s %512 bin/chris.bin
 	mv -f bin/chris.bin $@
 	chmod 644 $@
+	chmod 755 ptable.sh
+	./ptable.sh
 
 bin/chris.elf: bin/chris.o | bin
 	ld $(ldflags) $^ -o $@
