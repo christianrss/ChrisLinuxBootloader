@@ -12,7 +12,7 @@ section .bootloader
     msg1:
         db "Relocating...",0x0a,0x0d,0x00
     msg2:
-        db "Chris bootloader",0x0a,0x0d,0x00
+        db "Chris bootloader: Press any key to boot Linux:",0x0a,0x0d,0x00
     err1:
         db "FATAL: No bootable partitions",0x0a,0x0d,0x00
 
@@ -42,11 +42,11 @@ section .bootloader
         pop bp
         ret
 
-    diskutil:
+    diskread:
         push bp
         mov bp,sp
         mov ax, 0x0201
-        mov bx,0xfc00
+        mov bx,0x7c00
         clc
         int 0x13
 
@@ -61,7 +61,7 @@ section .bootloader
         xor ax,ax
         mov cx,0x04
     
-    .loop1:
+    .loop:
         mov byte al,[bx]
         and al,0x80
         cmp al,0x80
@@ -127,6 +127,9 @@ section .bootloader
         push ax
         call print
         sub sp,0x02
+
+        xor ax,ax
+        int 0x16
 
         call getchs
         jc .err
