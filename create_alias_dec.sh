@@ -1,0 +1,1 @@
+alias dec='printf '\''%d\n'\'''

@@ -1,0 +1,1 @@
+alias hex='printf '\''0x%x\n'\'''

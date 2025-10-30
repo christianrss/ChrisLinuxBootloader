@@ -1,5 +1,5 @@
 flags:= -f elf
-ldflags := -m elf_i386
+ldflags := -m elf_i386 -T chris.ld
 NASMENV=-i include/
 export NASMENV
 
