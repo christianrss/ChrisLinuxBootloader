@@ -27,4 +27,4 @@ clean:
 	rm -f bin/*.o bin/*.img bin/*.elf
 
 run: bin/boot.img
-	qemu-system-i386 -nographic -hda $^ -m 512
+	qemu-system-i386 -hda $< -m 512

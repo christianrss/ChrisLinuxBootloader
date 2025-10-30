@@ -7,5 +7,5 @@ struc partition
     .type       resb 0x01
     .last       resb 0x03
     .lba        resd 0x01
-    .nsect       resd 0x01
+    .nsect      resd 0x01
 endstruc

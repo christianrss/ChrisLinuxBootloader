@@ -9,13 +9,23 @@ section .bootloader
     stack:
         jmp main
 
-    str:
-        db "Hello world",0x0a,0x0d,0x00
+    msg1:
+        db "Relocating...",0x0a,0x0d,0x00
+    msg2:
+        db "Relocation successful",0x0a,0x0d,0x00
 
     print:
         push bp
         mov bp,sp
         mov si,[bp+4]
+
+        cmp dl,0x80
+        je .off
+        jmp .nooff
+    .off:
+        add si,0x0400
+    
+    .nooff:
         mov ax,0x0e00
         xor bx,bx
 
@@ -28,7 +38,6 @@ section .bootloader
     .end:
         mov sp,bp
         pop bp
-        sub sp,0x02
         ret
 
     main:
@@ -42,15 +51,36 @@ section .bootloader
         mov sp,ax
         sti
 
-        mov ax,str
+        cmp byte dl,0x80
+        je relocation
+        jmp successful
+
+    relocation:
+        mov ax,msg1
         push ax
         call print
+        sub sp,0x02
+
+        mov si,0x7c00
+        mov di,0x7800
+        mov cx,0x0200
+        rep movsb
+
+        mov byte dl,0x90
+        jmp 0:0x7800
+        jmp halt
+        
+    successful:
+        mov ax,msg2
+        push ax
+        call print
+        sub sp,0x02
         jmp halt
         nop
 
     halt:
         hlt
-    .loop
+    .loop:
         nop
         jmp .loop
 
