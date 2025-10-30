@@ -3,7 +3,7 @@ ldflags := -m elf_i386 -T chris.ld
 NASMENV=-i include/
 export NASMENV
 
-.PHONY: clean
+.PHONY: clean run
 
 all: bin/boot.img
 
@@ -25,3 +25,6 @@ bin/chris.o: chris.asm | bin
 
 clean:
 	rm -f bin/*.o bin/*.img bin/*.elf
+
+run: bin/boot.img
+	qemu-system-i386 -nographic -hda $^ -m 512
